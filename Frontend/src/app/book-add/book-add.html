@@ -1,0 +1,77 @@
+<div class="container">
+  <div class="form-card">
+    <h2>{{ isEditMode ? 'Edit Book' : 'Add New Book' }}</h2>
+    
+    <form (ngSubmit)="saveBook()">
+      <div class="form-group">
+        <label>Title *</label>
+        <input 
+          type="text" 
+          [(ngModel)]="book.title" 
+          name="title" 
+          placeholder="Enter book title"
+          required>
+      </div>
+      
+      <div class="form-group">
+        <label>Author *</label>
+        <input 
+          type="text" 
+          [(ngModel)]="book.author" 
+          name="author" 
+          placeholder="Enter author name"
+          required>
+      </div>
+      
+      <div class="form-group">
+        <label>ISBN *</label>
+        <input 
+          type="text" 
+          [(ngModel)]="book.isbn" 
+          name="isbn" 
+          placeholder="Enter ISBN"
+          required>
+      </div>
+      
+      <div class="form-group">
+        <label>Category *</label>
+        <input 
+          type="text" 
+          [(ngModel)]="book.category" 
+          name="category" 
+          placeholder="Enter category (e.g., Programming, Fiction)"
+          required>
+      </div>
+      
+      <div class="form-group">
+        <label>Quantity *</label>
+        <input 
+          type="number" 
+          [(ngModel)]="book.quantity" 
+          name="quantity" 
+          placeholder="Enter quantity"
+          min="0"
+          required>
+      </div>
+      
+      <div class="form-group checkbox-group">
+        <label>
+          <input 
+            type="checkbox" 
+            [(ngModel)]="book.available" 
+            name="available">
+          <span>Available for borrowing</span>
+        </label>
+      </div>
+      
+      <div class="form-actions">
+        <button type="submit" class="btn-save">
+          {{ isEditMode ? 'Update Book' : 'Add Book' }}
+        </button>
+        <button type="button" (click)="cancel()" class="btn-cancel">
+          Cancel
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
