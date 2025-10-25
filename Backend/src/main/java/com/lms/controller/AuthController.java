@@ -30,7 +30,7 @@ public class AuthController {
         } catch (BadCredentialsException e) {
             System.err.println("Bad credentials for user: " + request.getUsername());
             e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid username or password");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid username or passwordd");
         } catch (Exception e) {
             System.err.println("Authentication error: " + e.getMessage());
             e.printStackTrace();
