@@ -6,6 +6,20 @@
       <button (click)="logout()" class="btn-logout">Logout</button>
     </div>
   </div>
+ <div class="search-bar">
+  <input
+    type="text"
+    FormModule="searchTerm"
+    placeholder="Search by title, author, ISBN, or category"
+    (input)="searchBooks()"
+    class="search-input"
+  />
+  <ul *ngIf="books.length > 0 && searchTerm">
+    <li *ngFor="let book of books">{{ book.title }} by {{ book.author }}</li>
+  </ul>
+</div>
+
+
   
   <div class="book-grid">
     <div *ngFor="let book of books" class="book-card">

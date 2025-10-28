@@ -1,3 +1,22 @@
+.search-bar {
+  margin: 10px 0;
+  text-align: center;
+}
+
+.search-input {
+  width: 60%;
+  padding: 8px 12px;
+  font-size: 16px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 10px #667eea33;
+}
+
 .container {
   max-width: 1200px;
   margin: 0 auto;
