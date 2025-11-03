@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Borrowed Books</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<div class="library-background">
+  <div class="overlay"></div>
+  <div class="container borrow-books-container mt-4">
+    <h2 class="text-center mb-4 borrowed-header">📚 My Borrowed Books</h2>
+
+    <div *ngIf="loading" class="text-center text-primary loading-block">
+      Loading your borrowed books...
+    </div>
+
+    <div *ngIf="errorMessage" class="alert alert-danger text-center error-block">
+      {{ errorMessage }}
+    </div>
+
+    <div class="table-responsive">
+      <table 
+        *ngIf="!loading && borrowedBooks.length > 0" 
+        class="table table-bordered table-hover align-middle text-center borrowed-table shadow-sm">
+        <thead class="table-primary">
+          <tr>
+            <th>Title</th>
+            <th>Author</th>
+            <th>Borrow Date</th>
+            <th>Due Date</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let record of borrowedBooks">
+            <td class="fw-bold book-title">{{ record.book.title }}</td>
+            <td class="book-author">{{ record.book.author }}</td>
+            <td>{{ record.borrowDate }}</td>
+            <td>{{ record.dueDate }}</td>
+            <td>
+              <span [ngClass]="{
+                'text-warning': record.status === 'Pending',
+                'text-success': record.status === 'Borrowed',
+                'text-danger': record.status === 'Overdue',
+                'text-muted': record.status === 'Returned'
+              }">
+                {{ record.status }}
+              </span>
+            </td>
+            <td>
+              <button 
+                *ngIf="record.status.toUpperCase() === 'BORROWED'" 
+                class="btn btn-danger btn-return"
+                (click)="returnBook(record.id)">
+                Return Book
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p *ngIf="!loading && borrowedBooks.length === 0 && !errorMessage" class="text-center text-muted empty-msg mt-5">
+      No borrowed books found.
+    </p>
+  </div>
+</div>
+
+<style>
+  body {
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+    background: transparent;
+  }
+  .library-background {
+    position: relative;
+    min-height: 100vh;
+    background-image: url('https://media.istockphoto.com/id/1151849228/vector/library-book.jpg?s=612x612&w=0&k=20&c=GcQEMiL1ZwjiIh38S8LkNwLaYcIi9ERQ4IVmBMTxvQY=');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    padding: 60px 0;
+  }
+  .overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(255, 250, 245, 0.21);
+    backdrop-filter: blur(2px);
+    z-index: 1;
+  }
+  .borrow-books-container {
+    position: relative;
+    z-index: 2;
+    max-width: 960px;
+    margin: 0 auto;
+    background: rgba(255,255,255,0.99);
+    border-radius: 22px;
+    padding: 38px 24px 36px 24px;
+    box-shadow: 0 12px 38px rgba(44,62,80,0.09), 0 1px 4px rgba(52,58,64,0.07);
+  }
+  .borrowed-header {
+    font-weight: 700;
+    letter-spacing: -.5px;
+    color: #253043;
+    font-size: 2.18rem;
+    padding-bottom: 10px;
+  }
+  .loading-block {
+    font-size: 1.05rem;
+    font-weight: 500;
+    margin-bottom: 8px;
+  }
+  .error-block {
+    margin-top: 8px;
+    border-radius: 10px;
+    box-shadow: 0 3px 12px rgba(220,53,69,0.08);
+    font-size: 1rem;
+  }
+  .table-responsive {
+    border-radius: 14px;
+    margin-bottom: 2px;
+    box-shadow: 0 2px 8px rgba(44,62,80,0.07);
+    background: transparent;
+  }
+  .borrowed-table {
+    border-radius: 14px;
+    overflow: hidden;
+    background-color: #f8f9fa;
+    font-size: 1rem;
+    margin-top: 8px;
+    margin-bottom: 8px;
+    box-shadow: 0 3px 16px rgba(44,62,80,0.06);
+  }
+  .borrowed-table th {
+    background: linear-gradient(90deg, #007bff 0%, #4dabf7 100%);
+    color: #fff;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border: none;
+    font-size: 1rem;
+    padding: 14px 8px;
+  }
+  .borrowed-table td {
+    vertical-align: middle;
+    color: #343a40;
+    background: #f8f9fa;
+    font-size: 0.97rem;
+    padding: 13px 8px;
+    border: none;
+    transition: background 0.22s;
+  }
+  .borrowed-table tr:hover td {
+    background: #fff9ea;
+  }
+  .book-title {
+    color: #27364f;
+    font-weight: 700;
+    font-size: 1.08rem;
+    letter-spacing: -0.5px;
+  }
+  .book-author {
+    color: #4b535d;
+    font-style: italic;
+    font-size: 1.03rem;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+  }
+  .btn-return {
+    background: linear-gradient(90deg, #e74c3c 0%, #c0392b 100%);
+    color: #fff;
+    font-weight: 600;
+    border: none;
+    border-radius: 14px;
+    padding: 8px 22px;
+    box-shadow: 0 3px 16px rgba(220, 53, 69, 0.07);
+    transition: background 0.17s, transform 0.17s, box-shadow 0.17s;
+    font-size: 1rem;
+  }
+  .btn-return:hover {
+    background: linear-gradient(90deg, #c0392b 0%, #e74c3c 100%);
+    transform: scale(1.07) translateY(-1px);
+    box-shadow: 0 6px 16px rgba(220, 53, 69, 0.15);
+  }
+  .text-warning {
+    font-weight: 600;
+    color: #f39c12 !important;
+    font-size: 1rem;
+  }
+  .text-success {
+    font-weight: 600;
+    color: #20c997 !important;
+    font-size: 1rem;
+  }
+  .text-danger {
+    font-weight: 600;
+    color: #e74c3c !important;
+    font-size: 1rem;
+  }
+  .text-muted {
+    font-style: italic;
+    color: #6c757d !important;
+    font-size: 1rem;
+  }
+  .empty-msg {
+    margin-top: 32px;
+    font-style: italic;
+    font-weight: 500;
+    color: #b8bcc8;
+    font-size: 1.07rem;
+    background: rgba(255,255,255,0.79);
+    border-radius: 10px;
+    padding: 11px 6px;
+    box-shadow: 0 2px 9px rgba(66,70,73,0.045);
+    display: inline-block;
+  }
+  @media (max-width: 768px) {
+    .borrow-books-container {
+      padding: 16px 3vw 16px 3vw;
+    }
+    .borrowed-table th, .borrowed-table td {
+      font-size: 0.92rem;
+      padding: 8px 4px;
+    }
+    .borrowed-header {
+      font-size: 1.33rem;
+      padding-bottom: 5px;
+    }
+    .btn-return {
+      font-size: 0.95rem;
+      padding: 6px 15px;
+      border-radius: 10px;
+    }
+  }
+  @media (max-width: 576px) {
+    .borrow-books-container {
+      padding: 7px 2vw 7px 2vw;
+    }
+    .borrowed-header {
+      font-size: 1.08rem;
+    }
+    .btn-return {
+      font-size: 0.88rem;
+      padding: 5px 10px;
+    }
+    .empty-msg {
+      font-size: 0.94rem;
+      padding: 8px 3px;
+    }
+  }
+</style>
+
+</body>
+</html>

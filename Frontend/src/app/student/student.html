@@ -1,0 +1,423 @@
+<div class="library-background">
+  <div class="overlay"></div>
+  <div class="container available-books-container">
+    <h2 class="heading-available mb-4">Available Books</h2>
+
+    <!-- Search Bar Section -->
+    <div class="search-bar-wrapper mb-5">
+      <div class="search-bar d-flex flex-column flex-md-row align-items-stretch justify-content-between gap-3">
+        <input
+          type="text"
+          class="form-control search-input"
+          placeholder="🔍 Search by title or author..."
+          [(ngModel)]="searchTerm"
+          (keyup)="searchBooks()"
+        />
+        <div class="button-group d-flex gap-2">
+          <button type="button" class="btn btn-search" (click)="searchBooks()">🔍 Search</button>
+          <button type="button" class="btn btn-showall" (click)="showAllBooks()">Show All</button>
+          <button type="button" class="btn btn-refresh" (click)="loadBooks()">🔄 Refresh</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="loading" class="loading-spinner text-center mb-4">
+      <span class="loading-text">⏳ Loading books...</span>
+    </div>
+
+    <!-- Books Grid -->
+    <div class="row gy-5">
+      <div class="col-lg-6" *ngFor="let book of filteredBooks">
+        <div class="card book-card h-100 shadow-lg border-0">
+          <div class="card-body d-flex flex-column justify-content-between p-5">
+            <div>
+              <h4 class="card-title book-title mb-2">{{ book.title }}</h4>
+              <p class="book-author mb-3">by {{ book.author }}</p>
+              <div class="mb-4">
+                <span class="badge bg-warning text-dark px-3 py-2 fs-5">{{ book.category }}</span>
+              </div>
+              <p class="available-copies mb-0">
+                <span class="badge bg-success px-3 py-2 fs-5">{{ book.availableCopies }} Available</span>
+              </p>
+            </div>
+            <button
+              type="button"
+              class="btn btn-borrow mt-4 fw-semibold w-100 py-3"
+              (click)="requestBorrow(book.id)"
+              [disabled]="book.availableCopies <= 0"
+            >
+              📚 Request Borrow
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- No Results Message -->
+    <div *ngIf="!loading && filteredBooks.length === 0 && books.length > 0" class="no-results mt-5">
+      <p class="text-center text-muted">❌ No books match your search.</p>
+    </div>
+
+    <!-- Empty Library Message -->
+    <div *ngIf="!loading && books.length === 0" class="empty-library mt-5">
+      <p class="text-center text-muted">📭 No books available at the moment.</p>
+    </div>
+  </div>
+</div>
+
+<style>
+  /* Library Background */
+  .library-background {
+    position: relative;
+    min-height: 100vh;
+    background-image: url('https://media.istockphoto.com/id/1151849228/vector/library-book.jpg?s=612x612&w=0&k=20&c=GcQEMiL1ZwjiIh38S8LkNwLaYcIi9ERQ4IVmBMTxvQY=');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    padding: 40px 20px;
+  }
+
+  .overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(255, 251, 240, 0.22);
+    backdrop-filter: blur(2px);
+    z-index: 1;
+  }
+
+  .available-books-container {
+    position: relative;
+    z-index: 2;
+    max-width: 1200px;
+    margin: 0 auto;
+    background: rgba(255, 255, 255, 0.98);
+    border-radius: 24px;
+    padding: 48px 40px;
+    box-shadow: 0 20px 60px rgba(44, 62, 80, 0.2), 0 2px 10px rgba(52, 58, 64, 0.1);
+  }
+
+  .heading-available {
+    font-weight: 700;
+    text-align: center;
+    color: #1a2332;
+    font-size: 2.5rem;
+    letter-spacing: -1px;
+    margin-bottom: 2rem !important;
+  }
+
+  /* Search Bar Styles - BIGGER */
+  .search-bar-wrapper {
+    margin-bottom: 3rem;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.95) 100%);
+    border-radius: 18px;
+    padding: 20px 24px;
+    box-shadow: 0 6px 20px rgba(44, 62, 80, 0.12);
+    border: 1px solid rgba(0, 123, 255, 0.1);
+  }
+
+  .search-bar {
+    display: flex;
+    gap: 1rem;
+  }
+
+  .search-input {
+    flex: 1;
+    min-width: 250px;
+    border-radius: 14px;
+    border: 2px solid #d3d7de;
+    padding: 16px 18px;
+    font-size: 1.05rem;
+    font-weight: 500;
+    transition: all 0.3s ease-in-out;
+    background: #fff;
+  }
+
+  .search-input::placeholder {
+    color: #999;
+    font-size: 1.05rem;
+  }
+
+  .search-input:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 4px rgba(0, 123, 255, 0.2);
+    background: #fff;
+  }
+
+  .button-group {
+    display: flex;
+    gap: 0.8rem;
+  }
+
+  .btn-search,
+  .btn-showall,
+  .btn-refresh {
+    border-radius: 12px;
+    font-weight: 600;
+    padding: 14px 24px;
+    white-space: nowrap;
+    font-size: 1rem;
+    transition: all 0.2s ease;
+    border: none;
+  }
+
+  .btn-search {
+    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+    color: white;
+    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.2);
+  }
+
+  .btn-search:hover {
+    background: linear-gradient(135deg, #0056b3 0%, #004085 100%);
+    box-shadow: 0 6px 16px rgba(0, 123, 255, 0.3);
+    transform: translateY(-2px);
+  }
+
+  .btn-showall {
+    background: #6c757d;
+    color: white;
+    box-shadow: 0 4px 12px rgba(108, 117, 125, 0.2);
+  }
+
+  .btn-showall:hover {
+    background: #5a6268;
+    box-shadow: 0 6px 16px rgba(108, 117, 125, 0.3);
+    transform: translateY(-2px);
+  }
+
+  .btn-refresh {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    color: white;
+    box-shadow: 0 4px 12px rgba(40, 167, 69, 0.2);
+  }
+
+  .btn-refresh:hover {
+    background: linear-gradient(135deg, #20c997 0%, #17a2b8 100%);
+    box-shadow: 0 6px 16px rgba(40, 167, 69, 0.3);
+    transform: translateY(-2px);
+  }
+
+  /* Loading State */
+  .loading-spinner {
+    padding: 30px;
+    background: rgba(0, 123, 255, 0.12);
+    border-radius: 14px;
+    border-left: 5px solid #007bff;
+  }
+
+  .loading-text {
+    color: #0056b3;
+    font-weight: 700;
+    font-size: 1.1rem;
+  }
+
+  /* Book Card Styles - LARGER */
+  .book-card {
+    border-radius: 20px;
+    transition: transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.28s;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, #fafbfc 100%);
+    box-shadow: 0 8px 24px rgba(44, 62, 80, 0.12);
+    min-height: 320px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  .book-card:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 20px 40px rgba(44, 62, 80, 0.22);
+    border: 1px solid #e0e7ff;
+  }
+
+  .book-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1a2332;
+    letter-spacing: -0.5px;
+    line-height: 1.3;
+  }
+
+  .book-author {
+    color: #5c6777;
+    font-size: 1.05rem;
+    margin-bottom: 0 !important;
+    font-style: italic;
+    font-weight: 500;
+  }
+
+  .available-copies {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #4bb543;
+    margin-bottom: 0 !important;
+  }
+
+  .badge {
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    box-shadow: 0 2px 8px rgba(32, 201, 151, 0.1);
+    padding: 8px 16px !important;
+  }
+
+  .btn-borrow {
+    background: linear-gradient(135deg, #20c997 0%, #28a745 100%);
+    color: #fff !important;
+    border: none;
+    border-radius: 14px;
+    font-size: 1.08rem;
+    font-weight: 700;
+    box-shadow: 0 4px 16px rgba(40, 167, 69, 0.2);
+    padding: 14px 20px !important;
+    transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .btn-borrow:hover:not(:disabled) {
+    background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%);
+    box-shadow: 0 8px 24px rgba(40, 167, 69, 0.3);
+    transform: scale(1.05) translateY(-3px);
+  }
+
+  .btn-borrow:disabled {
+    background: #c7c8ce !important;
+    color: #fff !important;
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+
+  /* Empty/No Results States */
+  .no-results,
+  .empty-library {
+    background: linear-gradient(135deg, rgba(200, 200, 200, 0.08) 0%, rgba(220, 220, 220, 0.08) 100%);
+    border-radius: 14px;
+    padding: 40px;
+    text-align: center;
+    border: 1px dashed #ccc;
+  }
+
+  .no-results p,
+  .empty-library p {
+    margin: 0;
+    font-size: 1.2rem;
+    color: #666;
+    font-weight: 500;
+  }
+
+  /* Responsive Design */
+  @media (max-width: 1024px) {
+    .available-books-container {
+      padding: 36px 30px;
+    }
+
+    .heading-available {
+      font-size: 2rem;
+    }
+
+    .search-bar {
+      flex-direction: column;
+    }
+
+    .search-input {
+      min-width: 100%;
+    }
+
+    .button-group {
+      flex-direction: row;
+      width: 100%;
+    }
+
+    .btn-search,
+    .btn-showall,
+    .btn-refresh {
+      flex: 1;
+      min-width: 100px;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .available-books-container {
+      padding: 24px 18px;
+      border-radius: 18px;
+    }
+
+    .heading-available {
+      font-size: 1.6rem;
+      margin-bottom: 1.5rem !important;
+    }
+
+    .search-bar-wrapper {
+      padding: 16px 18px;
+    }
+
+    .search-input {
+      padding: 12px 14px;
+      font-size: 1rem;
+    }
+
+    .btn-search,
+    .btn-showall,
+    .btn-refresh {
+      padding: 12px 16px;
+      font-size: 0.95rem;
+    }
+
+    .book-title {
+      font-size: 1.3rem;
+    }
+
+    .btn-borrow {
+      font-size: 1rem;
+      padding: 12px 16px !important;
+    }
+  }
+
+  @media (max-width: 576px) {
+    .available-books-container {
+      padding: 18px 12px;
+    }
+
+    .heading-available {
+      font-size: 1.3rem;
+      margin-bottom: 1rem !important;
+    }
+
+    .search-bar-wrapper {
+      padding: 12px 14px;
+    }
+
+    .search-bar {
+      flex-direction: column;
+      gap: 0.8rem;
+    }
+
+    .search-input {
+      padding: 12px 12px;
+      font-size: 1rem;
+    }
+
+    .button-group {
+      flex-direction: column;
+    }
+
+    .btn-search,
+    .btn-showall,
+    .btn-refresh {
+      width: 100%;
+      padding: 12px 12px;
+      font-size: 0.9rem;
+    }
+
+    .book-title {
+      font-size: 1.1rem;
+    }
+
+    .btn-borrow {
+      font-size: 0.95rem;
+      padding: 10px 12px !important;
+    }
+  }
+</style>
