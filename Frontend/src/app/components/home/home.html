@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Library Home</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;900&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<div class="library-home-bg">
+  <div class="overlay"></div>
+  <div class="home-container">
+    <div class="welcome-card">
+      <div class="emoji">📚✨</div>
+      <h1 class="main-heading mb-3">
+        Welcome to the <span class="brand-highlight">Online Library</span> Management System
+      </h1>
+      <p class="tagline">
+        Explore, read, borrow, and discover — <b>your library is now digital</b>!
+      </p>
+      <a class="btn btn-get-started" href="/student">
+        <span class="me-1">🚀</span> Get Started
+      </a>
+    </div>
+  </div>
+</div>
+
+<style>
+  body {
+    font-family: 'Poppins', 'Inter', sans-serif;
+    margin: 0;
+    min-height: 100vh;
+    background: transparent;
+  }
+  .library-home-bg {
+    background: url('https://media.istockphoto.com/id/1151849228/vector/library-book.jpg?s=612x612&w=0&k=20&c=GcQEMiL1ZwjiIh38S8LkNwLaYcIi9ERQ4IVmBMTxvQY=') center/cover fixed no-repeat;
+    min-height: 100vh;
+    position: relative;
+    padding: 0;
+  }
+  .overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(250,248,255, 0.33);
+    backdrop-filter: blur(2.2px);
+    z-index: 1;
+  }
+  .home-container {
+    text-align: center;
+    padding: 0 20px;
+    position: relative;
+    z-index: 2;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+  .welcome-card {
+    background: rgba(255,255,255,0.96);
+    border-radius: 32px;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.13), 0 2px 14px rgba(44,62,80,0.10);
+    display: inline-block;
+    padding: 55px 40px 48px 40px;
+    margin-top: 60px;
+    max-width: 540px;
+    width: 100%;
+    animation: fadeInUp 0.9s cubic-bezier(.21,1.18,.77,1.03);
+  }
+  .emoji {
+    font-size: 3.2rem;
+    margin-bottom: 8px;
+  }
+  .main-heading {
+    font-size: 2.22rem;
+    font-weight: 800;
+    color: #212c49;
+    line-height: 1.2;
+    margin-bottom: 0.4em;
+    letter-spacing: -1.2px;
+  }
+  .brand-highlight {
+    background: linear-gradient(90deg, #007bff 15%, #fd7e14 85%);
+    color: #fff;
+    border-radius: 8px;
+    padding: 0 9px 2px 9px;
+    margin: 0 3px;
+    display: inline-block;
+  }
+  .tagline {
+    font-size: 1.14rem;
+    color: #49577e;
+    margin-bottom: 36px;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+  }
+  .btn-get-started {
+    background: linear-gradient(90deg, #007bff 0%, #20c997 100%);
+    color: #fff !important;
+    border: none;
+    border-radius: 50px;
+    font-family: inherit;
+    font-size: 1.17rem;
+    font-weight: 600;
+    padding: 14px 48px;
+    box-shadow: 0 6px 24px rgba(32, 201, 151, 0.13);
+    text-decoration: none;
+    transition: background 0.18s, transform 0.20s, box-shadow 0.20s;
+    display: inline-block;
+    margin-top: 22px;
+    letter-spacing: 0.03em;
+  }
+  .btn-get-started:hover, .btn-get-started:focus {
+    background: linear-gradient(90deg, #20c997 0%, #007bff 100%);
+    color: #fff !important;
+    box-shadow: 0 10px 34px rgba(51,128,255,0.21);
+    transform: scale(1.06) translateY(-2px);
+    text-decoration: none;
+    outline: none;
+  }
+  @media (max-width: 768px) {
+    .welcome-card {
+      padding: 36px 6vw 32px 6vw;
+      margin-top: 38px;
+      max-width: 98vw;
+    }
+    .main-heading {
+      font-size: 1.28rem;
+    }
+    .emoji {
+      font-size: 2.1rem;
+    }
+    .btn-get-started {
+      font-size: 1.01rem;
+      padding: 11px 26px;
+    }
+  }
+  @media (max-width: 480px) {
+    .welcome-card {
+      padding: 18px 3vw 18px 3vw;
+      margin-top: 15vw;
+    }
+    .main-heading {
+      font-size: 0.94rem;
+    }
+    .btn-get-started {
+      padding: 9px 10px;
+      font-size: 0.96rem;
+    }
+  }
+  @keyframes fadeInUp {
+    0% { opacity: 0; transform: translate3d(0,60px,0);}
+    100% { opacity: 1; transform: none;}
+  }
+</style>
+
+</body>
+</html>
