@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Librarian Dashboard - Library Management</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<div class="library-background">
+  <div class="overlay"></div>
+
+  <div class="container main-container">
+    <!-- Header -->
+    <div class="header-section">
+      <div class="header-content">
+        <h1 class="dashboard-title">📚 Librarian Dashboard</h1>
+        <p class="dashboard-subtitle">Manage Books, Requests & Borrowers</p>
+      </div>
+    </div>
+
+    <!-- Add New Book Section -->
+    <div class="card card-section mb-4">
+      <div class="card-header card-title-header">
+        <h3 class="card-title">➕ Add New Book</h3>
+      </div>
+      <div class="card-body">
+        <form class="form-section">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">Title</label>
+              <input 
+                class="form-control"
+                [(ngModel)]="newBook.title" 
+                name="title"
+                placeholder="Enter book title" 
+              />
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Author</label>
+              <input 
+                class="form-control"
+                [(ngModel)]="newBook.author" 
+                name="author"
+                placeholder="Enter author name" 
+              />
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Total Copies</label>
+              <input
+                class="form-control"
+                [(ngModel)]="newBook.totalCopies"
+                name="totalCopies"
+                type="number"
+                min="1"
+                placeholder="Enter total copies"
+              />
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Available Copies</label>
+              <input
+                class="form-control"
+                [(ngModel)]="newBook.availableCopies"
+                name="availableCopies"
+                type="number"
+                min="0"
+                placeholder="Enter available copies"
+              />
+            </div>
+            <div class="col-12">
+              <button 
+                class="btn btn-add w-100"
+                (click)="addBook()"
+              >
+                <span class="btn-icon">📖</span> Add Book
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- All Books Table -->
+    <div class="card card-section mb-4">
+      <div class="card-header card-title-header">
+        <h3 class="card-title">📕 All Books</h3>
+      </div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table custom-table mb-0">
+            <thead>
+              <tr>
+                <th scope="col">ID</th>
+                <th scope="col">Title</th>
+                <th scope="col">Author</th>
+                <th scope="col">Total</th>
+                <th scope="col">Available</th>
+                <th scope="col" class="text-center">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let book of books">
+                <ng-container *ngIf="editingBook?.id !== book.id; else editMode">
+                  <td class="fw-semibold text-muted">{{ book.id }}</td>
+                  <td class="book-title">{{ book.title }}</td>
+                  <td class="book-author">{{ book.author }}</td>
+                  <td><span class="badge bg-info">{{ book.totalCopies }}</span></td>
+                  <td><span class="badge bg-success">{{ book.availableCopies }}</span></td>
+                  <td class="text-center">
+                    <button 
+                      class="btn btn-edit me-2 mb-1"
+                      (click)="editBook(book)"
+                    >
+                      ✏️ Edit
+                    </button>
+                    <button 
+                      class="btn btn-delete mb-1"
+                      (click)="deleteBook(book.id!)"
+                    >
+                      🗑️ Delete
+                    </button>
+                  </td>
+                </ng-container>
+                <ng-template #editMode>
+                  <td class="fw-semibold text-muted">{{ editingBook?.id }}</td>
+                  <td><input class="form-control form-control-sm" [(ngModel)]="editingBook!.title" name="editTitle" /></td>
+                  <td><input class="form-control form-control-sm" [(ngModel)]="editingBook!.author" name="editAuthor" /></td>
+                  <td><input class="form-control form-control-sm" [(ngModel)]="editingBook!.totalCopies" name="editTotal" type="number" min="1" /></td>
+                  <td><input class="form-control form-control-sm" [(ngModel)]="editingBook!.availableCopies" name="editAvailable" type="number" min="0" /></td>
+                  <td class="text-center">
+                    <button 
+                      class="btn btn-save me-2 mb-1"
+                      (click)="updateBook()"
+                    >
+                      💾 Save
+                    </button>
+                    <button 
+                      class="btn btn-cancel mb-1"
+                      (click)="cancelEdit()"
+                    >
+                      ✖️ Cancel
+                    </button>
+                  </td>
+                </ng-template>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pending Borrow Requests -->
+    <div class="card card-section mb-4">
+      <div class="card-header card-title-header d-flex justify-content-between align-items-center">
+        <h3 class="card-title mb-0">⏳ Pending Borrow Requests</h3>
+        <button 
+          class="btn btn-refresh"
+          (click)="loadPendingRequests()"
+        >
+          🔄 Refresh
+        </button>
+      </div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table custom-table mb-0">
+            <thead>
+              <tr>
+                <th scope="col">ID</th>
+                <th scope="col">User</th>
+                <th scope="col">Book</th>
+                <th scope="col">Status</th>
+                <th scope="col">Due Date</th>
+                <th scope="col" class="text-center">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let record of pendingRequests">
+                <td class="fw-semibold text-muted">{{ record.id }}</td>
+                <td class="user-name">{{ record.user?.name || 'Unknown' }}</td>
+                <td class="book-title">{{ record.book?.title || 'Unknown' }}</td>
+                <td>
+                  <span class="badge bg-warning text-dark">{{ record.status }}</span>
+                </td>
+                <td>
+                  <input
+                    class="form-control form-control-sm date-input"
+                    type="date"
+                    [(ngModel)]="record.dueDate"
+                    name="dueDate{{ record.id }}"
+                    [disabled]="record.status !== 'Pending'"
+                  />
+                </td>
+                <td class="text-center">
+                  <button
+                    *ngIf="record.status === 'Pending'"
+                    class="btn btn-approve me-2 mb-1"
+                    (click)="approveRequest(record.id)"
+                  >
+                    ✅ Approve
+                  </button>
+                  <button
+                    *ngIf="record.status === 'Pending'"
+                    class="btn btn-reject mb-1"
+                    (click)="reject(record.id)"
+                  >
+                    ❌ Reject
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Approved Borrow Records -->
+    <div class="card card-section mb-4">
+      <div class="card-header card-title-header">
+        <h3 class="card-title">✅ Approved Borrowed Books</h3>
+      </div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table custom-table mb-0">
+            <thead>
+              <tr>
+                <th scope="col">ID</th>
+                <th scope="col">User</th>
+                <th scope="col">Book</th>
+                <th scope="col">Due Date</th>
+                <th scope="col" class="text-center">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let record of approvedRecords">
+                <td class="fw-semibold text-muted">{{ record.id }}</td>
+                <td class="user-name">{{ record.user?.name || 'Unknown' }}</td>
+                <td class="book-title">{{ record.book?.title || 'Unknown' }}</td>
+                <td>{{ record.dueDate || 'N/A' }}</td>
+                <td class="text-center">
+                  <button 
+                    class="btn btn-reminder"
+                    (click)="sendManualReminder(record.id)"
+                  >
+                    ✉️ Send Reminder
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  body {
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+  .library-background {
+    position: relative;
+    min-height: 100vh;
+    background-image: url('https://media.istockphoto.com/id/1151849228/vector/library-book.jpg?s=612x612&w=0&k=20&c=GcQEMiL1ZwjiIh38S8LkNwLaYcIi9ERQ4IVmBMTxvQY=');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    padding: 40px 20px;
+  }
+  .overlay {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(255, 255, 255, 0.25);
+    backdrop-filter: blur(3px);
+    z-index: 1;
+  }
+  .main-container {
+    position: relative;
+    z-index: 2;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  .header-section {
+    text-align: center;
+    margin-bottom: 40px;
+  }
+  .header-content {
+    background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%);
+    border-radius: 20px;
+    padding: 40px 30px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    border: 1px solid rgba(255,255,255,0.8);
+  }
+  .dashboard-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.8rem;
+    font-weight: 700;
+    color: #2c3e50;
+    margin-bottom: 10px;
+    letter-spacing: -0.5px;
+  }
+  .dashboard-subtitle {
+    font-size: 1rem;
+    color: #6c757d;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+  }
+  .card {
+    background: rgba(255,255,255,0.97);
+    border: 1px solid rgba(255,255,255,0.8);
+    border-radius: 20px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+    margin-bottom: 30px;
+    transition: all 0.3s ease;
+  }
+  .card:hover {
+    box-shadow: 0 15px 50px rgba(0,0,0,0.2);
+  }
+  .card-header {
+    background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+    color: #fff;
+    border: none;
+    padding: 20px 25px;
+  }
+  .card-title-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .card-title {
+    margin: 0;
+    font-size: 1.4rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+  .card-body {
+    padding: 25px;
+  }
+  .form-label {
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 8px;
+    font-size: 0.95rem;
+  }
+  .form-control {
+    border: 2px solid #dee2e6;
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    background: #fff;
+  }
+  .form-control:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.2rem rgba(0,123,255,0.15);
+    outline: none;
+  }
+  .date-input {
+    max-width: 180px;
+  }
+  .table-responsive {
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  .custom-table {
+    margin-bottom: 0;
+    border-collapse: separate;
+    border-spacing: 0;
+  }
+  .custom-table thead {
+    background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+    color: white;
+  }
+  .custom-table thead th {
+    padding: 18px 15px;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 1px;
+    border: none;
+    vertical-align: middle;
+  }
+  .custom-table tbody tr {
+    transition: all 0.3s ease;
+    border-bottom: 1px solid #e9ecef;
+  }
+  .custom-table tbody tr:hover {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    transform: scale(1.01);
+  }
+  .custom-table tbody td {
+    padding: 16px 15px;
+    vertical-align: middle;
+    border: none;
+    font-size: 0.95rem;
+  }
+  .book-title {
+    font-weight: 600;
+    color: #2c3e50;
+  }
+  .book-author {
+    color: #6c757d;
+    font-style: italic;
+  }
+  .user-name {
+    font-weight: 600;
+    color: #2c3e50;
+  }
+  .btn {
+    padding: 8px 16px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    border: none;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+  }
+  .btn-icon {
+    margin-right: 4px;
+  }
+  .btn-add {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    color: white;
+    box-shadow: 0 4px 12px rgba(40,167,69,0.3);
+  }
+  .btn-add:hover, .btn-add:focus {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(40,167,69,0.4);
+    background: linear-gradient(135deg, #20c997 0%, #17a2b8 100%);
+  }
+  .btn-edit {
+    background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);
+    color: white;
+    box-shadow: 0 4px 12px rgba(255,193,7,0.3);
+    padding: 6px 12px;
+    font-size: 0.8rem;
+  }
+  .btn-edit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255,193,7,0.4);
+    background: linear-gradient(135deg, #fd7e14 0%, #e83e8c 100%);
+  }
+  .btn-delete {
+    background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+    color: white;
+    box-shadow: 0 4px 12px rgba(220,53,69,0.3);
+    padding: 6px 12px;
+    font-size: 0.8rem;
+  }
+  .btn-delete:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(220,53,69,0.4);
+    background: linear-gradient(135deg, #c82333 0%, #bd2130 100%);
+  }
+  .btn-save {
+    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+    color: white;
+    box-shadow: 0 4px 12px rgba(0,123,255,0.3);
+    padding: 6px 12px;
+    font-size: 0.8rem;
+  }
+  .btn-save:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0,123,255,0.4);
+    background: linear-gradient(135deg, #0056b3 0%, #004085 100%);
+  }
+  .btn-cancel {
+    background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
+    color: white;
+    box-shadow: 0 4px 12px rgba(108,117,125,0.3);
+    padding: 6px 12px;
+    font-size: 0.8rem;
+  }
+  .btn-cancel:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(108,117,125,0.4);
+    background: linear-gradient(135deg, #5a6268 0%, #495057 100%);
+  }
+  .btn-refresh {
+    background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+    color: white;
+    padding: 8px 18px;
+    box-shadow: 0 4px 12px rgba(23,162,184,0.3);
+    font-size: 0.9rem;
+  }
+  .btn-refresh:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(23,162,184,0.4);
+    background: linear-gradient(135deg, #138496 0%, #0c5460 100%);
+  }
+  .btn-approve {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    color: white;
+    box-shadow: 0 4px 12px rgba(40,167,69,0.3);
+    padding: 6px 12px;
+    font-size: 0.8rem;
+  }
+  .btn-approve:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(40,167,69,0.4);
+  }
+  .btn-reject {
+    background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+    color: white;
+    box-shadow: 0 4px 12px rgba(220,53,69,0.3);
+    padding: 6px 12px;
+    font-size: 0.8rem;
+  }
+  .btn-reject:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(220,53,69,0.4);
+  }
+  .btn-reminder {
+    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+    color: white;
+    box-shadow: 0 4px 12px rgba(0,123,255,0.3);
+    padding: 8px 16px;
+    font-size: 0.85rem;
+  }
+  .btn-reminder:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0,123,255,0.4);
+    background: linear-gradient(135deg, #0056b3 0%, #004085 100%);
+  }
+  .badge {
+    padding: 6px 12px;
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+  @media (max-width: 1024px) {
+    .main-container {
+      max-width: 100%;
+    }
+    .dashboard-title {
+      font-size: 2.2rem;
+    }
+  }
+  @media (max-width: 768px) {
+    .library-background {
+      padding: 20px 10px;
+    }
+    .header-content {
+      padding: 25px 15px;
+    }
+    .dashboard-title {
+      font-size: 1.8rem;
+    }
+    .card-body {
+      padding: 15px;
+    }
+    .custom-table thead th,
+    .custom-table tbody td {
+      padding: 10px 8px;
+      font-size: 0.85rem;
+    }
+    .btn {
+      padding: 6px 10px;
+      font-size: 0.75rem;
+    }
+    .date-input {
+      max-width: 100%;
+    }
+    .card-title {
+      font-size: 1.1rem;
+    }
+    .form-label {
+      font-size: 0.9rem;
+    }
+    .btn-refresh {
+      padding: 6px 12px;
+      font-size: 0.8rem;
+    }
+  }
+  @media (max-width: 576px) {
+    .dashboard-title {
+      font-size: 1.5rem;
+    }
+    .dashboard-subtitle {
+      font-size: 0.85rem;
+    }
+    .card-title {
+      font-size: 1rem;
+    }
+    .table-responsive {
+      font-size: 0.8rem;
+    }
+    .custom-table thead th,
+    .custom-table tbody td {
+      padding: 8px 5px;
+    }
+    .btn {
+      padding: 5px 8px;
+      font-size: 0.7rem;
+    }
+  }
+</style>
+
+</body>
+</html>
