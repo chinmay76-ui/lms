@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Library Management System</title>
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <style>
+    :root {
+      --primary: #2c3e50;
+      --secondary: #3498db;
+      --accent: #e74c3c;
+      --light: #ecf0f1;
+    }
+    
+    body {
+      background: linear-gradient(rgba(44, 62, 80, 0.85), rgba(44, 62, 80, 0.9)), 
+                  url('https://images.unsplash.com/photo-1507842217343-583bb7270b66?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      min-height: 100vh;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: var(--light);
+    }
+    
+    .login-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 2rem 0;
+    }
+    
+    .login-box {
+      background: rgba(195, 244, 153, 0.95);
+      border-radius: 15px;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+      padding: 2.5rem;
+      width: 100%;
+      max-width: 450px;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      animation: fadeIn 0.8s ease-out;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .logo {
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+    
+    .logo i {
+      font-size: 3.5rem;
+      color: var(--primary);
+      margin-bottom: 0.5rem;
+      animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+    
+    .logo h1 {
+      font-weight: 700;
+      color: var(--primary);
+      font-size: 1.8rem;
+      margin-bottom: 0;
+    }
+    
+    .form-control {
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      border: 1px solid #ced4da;
+      transition: all 0.3s;
+    }
+    
+    .form-control:focus {
+      box-shadow: 0 0 0 0.25rem rgba(52, 152, 219, 0.25);
+      border-color: var(--secondary);
+    }
+    
+    .input-group-text {
+      background-color: #f8f9fa;
+      border-radius: 8px 0 0 8px;
+      border: 1px solid #ced4da;
+      border-right: none;
+    }
+    
+    .btn-login {
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      border: none;
+      border-radius: 8px;
+      padding: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      transition: all 0.3s;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .btn-login:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(44, 62, 80, 0.4);
+    }
+    
+    .btn-login:active {
+      transform: translateY(0);
+    }
+    
+    .register-link {
+      text-align: center;
+      margin-top: 1.5rem;
+      color: #6c757d;
+    }
+    
+    .register-link a {
+      text-decoration: none;
+      font-weight: 500;
+      color: var(--secondary);
+    }
+    
+    .register-link a:hover {
+      text-decoration: underline;
+    }
+    
+    .library-features {
+      margin-top: 2rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid #dee2e6;
+    }
+    
+    .features-title {
+      text-align: center;
+      color: var(--primary);
+      margin-bottom: 1rem;
+      font-weight: 600;
+    }
+    
+    .feature-item {
+      display: flex;
+      align-items: center;
+      margin-bottom: 0.75rem;
+      color: var(--primary);
+      animation: slideIn 0.5s ease-out;
+      animation-fill-mode: both;
+    }
+    
+    .feature-item:nth-child(1) { animation-delay: 0.2s; }
+    .feature-item:nth-child(2) { animation-delay: 0.4s; }
+    .feature-item:nth-child(3) { animation-delay: 0.6s; }
+    .feature-item:nth-child(4) { animation-delay: 0.8s; }
+    
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(-20px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+    
+    .feature-icon {
+      width: 30px;
+      text-align: center;
+      margin-right: 10px;
+      color: var(--secondary);
+    }
+    
+    
+    .hours-title {
+      text-align: center;
+      margin-bottom: 1rem;
+      font-weight: 600;
+    }
+    
+    .hours-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    
+    .hours-list li {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.25rem 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .contact-info {
+      margin-top: 1.5rem;
+      text-align: center;
+      color: var(--primary);
+      animation: fadeIn 1.2s ease-out;
+    }
+    
+    .contact-info a {
+      color: var(--secondary);
+      text-decoration: none;
+    }
+    
+    .contact-info a:hover {
+      text-decoration: underline;
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 576px) {
+      .login-box {
+        margin: 1rem;
+        padding: 2rem 1.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <div class="login-box">
+      <div class="logo">
+        <i class="fas fa-book-reader"></i>
+        <h1>Library Portal</h1>
+      </div>
+      
+      <form>
+        <div class="mb-3">
+          <label for="email" class="form-label">Email Address</label>
+          <div class="input-group">
+            <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+            <input 
+              type="email" 
+              class="form-control" 
+              id="email"
+              placeholder="Enter your email"
+              [(ngModel)]="email"
+              name="email"
+            >
+          </div>
+        </div>
+        
+        <div class="mb-4">
+          <label for="password" class="form-label">Password</label>
+          <div class="input-group">
+            <span class="input-group-text"><i class="fas fa-lock"></i></span>
+            <input 
+              type="password" 
+              class="form-control" 
+              id="password"
+              placeholder="Enter your password"
+              [(ngModel)]="password"
+              name="password"
+            >
+          </div>
+        </div>
+        
+        <button type="button" class="btn btn-primary btn-login w-100" (click)="loginUser()">
+          <i class="fas fa-sign-in-alt me-2"></i>Login
+        </button>
+        
+        <p class="register-link">
+          Don't have an account?
+          <a routerLink="/register" class="ms-1">Register here</a>
+        </p>
+        
+        <div class="contact-info">
+          <p><i class="fas fa-phone me-2"></i>+91 9337738523</p>
+          <p><i class="fas fa-envelope me-2"></i> <a href="mailto:library.lms.project@gmail.com">library.lms.project@gmail.com</a></p>
+          <p><i class="fas fa-map-marker-alt me-2"></i> 752050,Jatani,CUTM</p>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS Bundle with Popper -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
